@@ -25,6 +25,7 @@ function getData() {
         .done(function (data) {
 			var theThing = data.query
 			var results = theThing
+			var date = new Date();
 			
 			console.log("Count: " + theThing.count + " retrieved on " + theThing.created )
 
@@ -35,7 +36,7 @@ function getData() {
 			    if (results.hasOwnProperty(indexedQuote)) {
 					var quote = results[indexedQuote];
 					dateComps = quote["date"].split("-");
-					date = new Date(dateComps[0], dateComps[1] - 1, dateComps[2]);
+					date.setFullYear(dateComps[0], dateComps[1] - 1, dateComps[2]);
 					quote["Day"] = date.getDay(); 
 			        console.log(indexedQuote + " : " + quote["date"] + ", " +
 						quote["Date"] + ", " +
