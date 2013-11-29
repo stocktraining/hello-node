@@ -1,7 +1,12 @@
 var $ = require('jQuery');
 
-getData();
-// getHistoricalQuotes();
+var stock = {};
+var startDate = '2013-10-01';
+var endDate = '2013-11-26';
+
+stock.symbol = "CMG";
+
+getData(stock, startDate, endDate);
 
 function createWeeklyQuotes(dailyQuotes) {
 	var weeklyQuotes = Array();
@@ -40,7 +45,7 @@ function createWeeklyQuotes(dailyQuotes) {
 	return weeklyQuotes;
 }
 
-function printDailyQuote(quote) {
+function printDailyQuotes(quotes) {
 	var weekday=new Array(7);
 	weekday[0]="Sunday";
 	weekday[1]="Monday";
@@ -50,19 +55,23 @@ function printDailyQuote(quote) {
 	weekday[5]="Friday";
 	weekday[6]="Saturday";
 
-	if (!quote) {
-		console.log("Start, Open, High, Low, Close, Volume, Adj. Close, Day of Week, Day Name")
-	} else {
-    	console.log(quote["date"] + ", " +
-			quote["Open"] + ", " +
-			quote["High"] + ", " + 
-			quote["Low"] + ", " +
-			quote["Close"] + ", " +
-			quote["Volume"] + ", " +
-			quote["Adj_Close"] + ", " +
-			quote["ActualDate"].getDay() + ", " +
-			weekday[quote["ActualDate"].getDay()]);	
-	}
+	console.log(quotes.length + " Daily Quotes:")
+	console.log("Start, Open, High, Low, Close, Volume, Adj. Close, Day of Week, Day Name")
+	
+	for (var indexedQuote in quotes) {
+	    if (quotes.hasOwnProperty(indexedQuote)) {
+			var quote = quotes[indexedQuote]
+			console.log(quote["date"] + ", " +
+				quote["Open"] + ", " +
+				quote["High"] + ", " + 
+				quote["Low"] + ", " +
+				quote["Close"] + ", " +
+				quote["Volume"] + ", " +
+				quote["Adj_Close"] + ", " +
+				quote["ActualDate"].getDay() + ", " +
+				weekday[quote["ActualDate"].getDay()]);	
+	    }
+	 }	
 }
 
 function printWeeklyQuotes(weeklyQuotes) {
@@ -78,41 +87,38 @@ function printWeeklyQuotes(weeklyQuotes) {
 			quote["Low"] + ", " +
 			quote["Close"] + ", " +
 			quote["Count"]);		        
-	}
-	
+	}	
 }
 
-function getData() {
-    var url = "http://query.yahooapis.com/v1/public/yql";
-    var symbol = "AMZN";
-    // var data = encodeURIComponent("select * from yahoo.finance.quotes where symbol in ('" + symbol + "')");
+function createDailyQuotes(yahooQueryResults) {
+	console.log("creating daily quotes")
+	console.log("Count: " + yahooQueryResults.query.count + " retrieved on " + yahooQueryResults.query.created)
+	var results = yahooQueryResults.query.results.quote
 	var dateComps;
-	var startDate = '2013-11-01';
-	var endDate = '2013-11-26';
-	var data = encodeURIComponent('select * from yahoo.finance.historicaldata where symbol in ("AAPL") and startDate = "' + startDate + '" and endDate = "' + endDate + '"');
 
+	for (var indexedQuote in results) {
+	    if (results.hasOwnProperty(indexedQuote)) {
+			var quote = results[indexedQuote]
+			dateComps = quote["date"].split("-")
+			quote["ActualDate"] = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])
+	    }
+	 }
 	
+	return results;
+}
+
+function getData(stock, startDate, endDate) {
+	console.log("Retrieving stock data for " + stock.symbol)
+    var url = "http://query.yahooapis.com/v1/public/yql";
+    // var data = encodeURIComponent("select * from yahoo.finance.quotes where symbol in ('" + symbol + "')");
+	var data = encodeURIComponent("select * from yahoo.finance.historicaldata where symbol in ('" + stock.symbol + "') and startDate = '" + startDate + "' and endDate = '" + endDate + "'");
     $.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
         .done(function (data) {
-	// this method obviously needs some extraction and class structure - currently spiking algorithm and data format
-			var theThing = data.query
-			var results = theThing
-			
-			console.log("Count: " + theThing.count + " retrieved on " + theThing.created )
-
-			results = theThing.results.quote
-			printDailyQuote();
-			for (var indexedQuote in results) {
-			    if (results.hasOwnProperty(indexedQuote)) {
-					var quote = results[indexedQuote]
-					dateComps = quote["date"].split("-")
-					quote["ActualDate"] = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])
-					printDailyQuote(quote)
-			    }
-			 }
-
-			printWeeklyQuotes(createWeeklyQuotes(results))
+			stock.dailyQuotes = createDailyQuotes(data)
+			stock.weeklyQuotes = createWeeklyQuotes(stock.dailyQuotes)
+			printDailyQuotes(stock.dailyQuotes)
+			printWeeklyQuotes(stock.weeklyQuotes)
 		
-		console.log("All done.")
+			console.log("All done.")
     });
 }
