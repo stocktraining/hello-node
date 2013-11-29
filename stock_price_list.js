@@ -1,5 +1,15 @@
 var $ = require('jQuery');
 
+// not sure if this is alright as global - maybe we should explicitly set it as $.weekday?
+var weekday=new Array(7);
+weekday[0]="Sunday";
+weekday[1]="Monday";
+weekday[2]="Tuesday";
+weekday[3]="Wednesday";
+weekday[4]="Thursday";
+weekday[5]="Friday";
+weekday[6]="Saturday";
+
 var stock = {};
 var startDate = '2013-10-01';
 var endDate = '2013-11-26';
@@ -46,15 +56,6 @@ function createWeeklyQuotes(dailyQuotes) {
 }
 
 function printDailyQuotes(quotes) {
-	var weekday=new Array(7);
-	weekday[0]="Sunday";
-	weekday[1]="Monday";
-	weekday[2]="Tuesday";
-	weekday[3]="Wednesday";
-	weekday[4]="Thursday";
-	weekday[5]="Friday";
-	weekday[6]="Saturday";
-
 	console.log(quotes.length + " Daily Quotes:")
 	console.log("Start, Open, High, Low, Close, Volume, Adj. Close, Day of Week, Day Name")
 	
@@ -119,6 +120,6 @@ function getData(stock, startDate, endDate) {
 			printDailyQuotes(stock.dailyQuotes)
 			printWeeklyQuotes(stock.weeklyQuotes)
 		
-			console.log("All done.")
+			console.log("All done with " + stock.symbol + ".")
     });
 }
