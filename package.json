@@ -3,9 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "./node_modules/.bin/supervisor app.js",
+    "test": "./node_modules/.bin/mocha -u tdd"
   },
   "dependencies": {
+    "mocha": "*",
+    "chai": "*",
+    "sinon": "*",
+    "supervisor": "*",
     "express": "3.4.6",
     "hjs": "*",
     "less-middleware": "*"

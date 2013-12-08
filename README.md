@@ -1,6 +1,8 @@
-hello-node
-==========
+1) npm install
 
-Damien push
-Hi.  This is @MikeVitale42.
+=====Start=====
+npm start 
+
+=====Test=====
+npm test
 
