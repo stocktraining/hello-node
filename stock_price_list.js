@@ -17,6 +17,7 @@ var yahooResponse = {"query":{"count":12,"created":"2013-12-24T02:44:14Z","lang"
 
 stock.symbol = "AAPL";
 
+// testMovingAverage();
 getData(stock, startDate, endDate);
 // populateStockFromYahooQueryData(stock, yahooResponse);
 
@@ -130,50 +131,53 @@ function populateStockFromYahooQueryData(stock, data) {
 	printDailyQuotes(stock.dailyQuotes)
 	printWeeklyQuotes(stock.weeklyQuotes)	
 	// movingAverageForQuotes(stock.dailyQuotes.reverse(), 2, "Close", "Open2DayMA")
-	var avgs = movingAverageForQuotes(stock.weeklyQuotes.reverse(), 3, "Close")
+	var avgs = movingAverageForQuotes(stock.weeklyQuotes.reverse(), 10, "Close")
 	for (var i = 0; i < avgs.length; i++) {
 		console.log(i + " Avg: " + avgs[i])
 	}
 }
 
-// Pretty sure this calculation is still off - need some proper TDD to fix it up!! Study period blank is too much by 1
 function movingAverageForQuotes(quotes, studyPeriod, valueLabel) {
-	// assume quotes come in sorted from oldest to newest
+	// assume quotes come in the order to be averaged
 	studyPeriod = studyPeriod >= 1 ? studyPeriod : 1
 	valueLabel = valueLabel || "Close"
 	
-	if (studyPeriod >= quotes.length) { return [];}
+	if (studyPeriod > quotes.length) { return [];}
 	
 	var ma = [];
+	var inputs = [];
 	var accum = 0;
 	
-	console.log("mAFQ study period: " + studyPeriod)
-	console.log("mAFQ valueLabel: " + valueLabel)
+	// console.log("mAFQ study period: " + studyPeriod)
+	// console.log("mAFQ valueLabel: " + valueLabel)
 
 	var length = quotes.length;
 	for (var i = 0; i < length; i++) {
-		var quote = quotes[i]
-		// console.log("Adding to average: " + parseFloat(quote[valueLabel]))
-		accum += parseFloat(quote[valueLabel]);
+		var input = parseFloat(quotes[i][valueLabel])
+		accum += input;
+		inputs.push(input)
 		if (i < studyPeriod - 1) {
-			ma[i] = parseFloat(quote[valueLabel]);
+			ma[i] = 0;
 		} else {
 			ma[i] = Math.round(100 * (accum / studyPeriod))/100;
-			// console.log("accum is " +accum+", studyPeriod is "+studyPeriod+", div is "+ (accum / studyPeriod)+", and round result is " +ma[i])
-			accum -= ma[i+1-studyPeriod] || 0;
-			// console.log("removing value " + (ma[i+1-studyPeriod] || 0) + " from accum")
-			// console.log("updated accum is " + accum)
+			accum -= inputs[i+1-studyPeriod];
 		}
-		// console.log("MA"+i+": " + ma[i])
 	}
-	// kinda ugly but less confusing to me than using another array to queue previously accumulated values
-	for (var i = 0; i < studyPeriod - 1; i++) {
-		ma[i] = 0;
-	}	
 
 	return ma;
 }
 
+function testMovingAverage() {
+	var quotes = [];
+	for (var i = 0; i < 100; i++) {
+		var quote = {"testVal": i}
+		quotes.push(quote)
+	}
+	var avgs = movingAverageForQuotes(quotes, 50, "testVal")
+	for (var i = 0; i < avgs.length; i++) {
+		console.log(i + " Avg: " + avgs[i])
+	}
+}
 
 
 
