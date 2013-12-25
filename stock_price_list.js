@@ -235,9 +235,6 @@ function testGenerateSignals() {
 	}
 }
 
-// function generateSignals
-
-
 
 
 
