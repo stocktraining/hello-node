@@ -22,7 +22,8 @@ var basicCrossoverStrategy = {
 	position: function(val, keyVal) { return this.positionLong(val, keyVal) ? 1 : 0; }
 }
 
-testBasicCrossoverStrategy();
+testGenerateSignals();
+// testBasicCrossoverStrategy();
 // testMovingAverage();
 // getData(stock, startDate, endDate);
 // populateStockFromYahooQueryData(stock, yahooResponse);
@@ -192,6 +193,46 @@ function testBasicCrossoverStrategy() {
 	console.log("Even, 1 vs 1:" + basicCrossoverStrategy.position(1, 1))
 	console.log("Above, 1.1 vs 1:" + basicCrossoverStrategy.position(1.1, 1))
 	console.log("Below, .9 vs 1:" + basicCrossoverStrategy.position(.9, 1))
+}
+
+function generateSignalsUsingQuotesAndKeyValuesAndStrategy(quotes, keyValues, strategy, quoteValueLabel) {
+	strategy = strategy || basicCrossoverStrategy
+	quoteValueLabel = quoteValueLabel || "Close"
+	
+	var signals = []
+	var index = 0
+	var numberOfValues = keyValues.length
+	var position = 0 // 0 indicates flat, 1 indicates long
+	var action
+	
+	signals.push("Begin Study Period with " + numberOfValues + " total quotes.");
+	while (index < numberOfValues && keyValues[index] == 0) {
+		index++
+	}
+	signals.push("Begin trading on index " + index);
+	for (;index < numberOfValues; index++) {
+		var newPos = strategy.position(quotes[index][quoteValueLabel], keyValues[index])
+		if (newPos != position) {
+			position = newPos;
+			action = position ? "Buy" : "Sell"
+			signals.push(action + " at " + quotes[index][quoteValueLabel] + " based on key value of " + keyValues[index])
+		}
+	}
+	signals.push("End trading with position " + (position ? "long" : "flat"));
+	return signals;
+}
+
+function testGenerateSignals() {
+	var quotes = [];
+	for (var i = 0; i < 100; i++) {
+		var quote = {"testVal": i % 7 }
+		quotes.push(quote)
+	}
+	var avgs = movingAverageForQuotes(quotes, 11, "testVal")
+	var signals = generateSignalsUsingQuotesAndKeyValuesAndStrategy(quotes, avgs, basicCrossoverStrategy, "testVal")
+	for (var i = 0; i < signals.length; i++) {
+		console.log(i + " : " + signals[i])
+	}
 }
 
 // function generateSignals
