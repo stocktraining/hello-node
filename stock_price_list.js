@@ -17,8 +17,14 @@ var yahooResponse = {"query":{"count":12,"created":"2013-12-24T02:44:14Z","lang"
 
 stock.symbol = "AAPL";
 
+var basicCrossoverStrategy = {
+	positionLong: function(val, keyVal) { return val > keyVal; },
+	position: function(val, keyVal) { return this.positionLong(val, keyVal) ? 1 : 0; }
+}
+
+testBasicCrossoverStrategy();
 // testMovingAverage();
-getData(stock, startDate, endDate);
+// getData(stock, startDate, endDate);
 // populateStockFromYahooQueryData(stock, yahooResponse);
 
 function createWeeklyQuotes(dailyQuotes) {
@@ -178,6 +184,17 @@ function testMovingAverage() {
 		console.log(i + " Avg: " + avgs[i])
 	}
 }
+
+function testBasicCrossoverStrategy() {
+	console.log("Even, 1 vs 1:" + basicCrossoverStrategy.positionLong(1, 1))
+	console.log("Above, 1.1 vs 1:" + basicCrossoverStrategy.positionLong(1.1, 1))
+	console.log("Below, .9 vs 1:" + basicCrossoverStrategy.positionLong(.9, 1))
+	console.log("Even, 1 vs 1:" + basicCrossoverStrategy.position(1, 1))
+	console.log("Above, 1.1 vs 1:" + basicCrossoverStrategy.position(1.1, 1))
+	console.log("Below, .9 vs 1:" + basicCrossoverStrategy.position(.9, 1))
+}
+
+// function generateSignals
 
 
 
