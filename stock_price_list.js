@@ -1,5 +1,6 @@
 var $ = require('jQuery');
 
+
 // not sure if this is alright as global - maybe we should explicitly set it as $.weekday?
 var weekday=new Array(7);
 weekday[0]="Sunday";
@@ -16,17 +17,6 @@ var endDate = '2013-10-28';
 var yahooResponse = {"query":{"count":12,"created":"2013-12-24T02:44:14Z","lang":"en-US","diagnostics":{"url":[{"execution-start-time":"1","execution-stop-time":"2","execution-time":"1","content":"http://www.datatables.org/yahoo/finance/yahoo.finance.historicaldata.xml"},{"execution-start-time":"7","execution-stop-time":"48","execution-time":"41","content":"http://ichart.finance.yahoo.com/table.csv?g=d&f=2013&e=26&c=2013&b=10&a=10&d=10&s=CMG"},{"execution-start-time":"50","execution-stop-time":"54","execution-time":"4","content":"http://ichart.finance.yahoo.com/table.csv?g=d&f=2013&e=26&c=2013&b=10&a=10&d=10&s=CMG"}],"publiclyCallable":"true","cache":[{"execution-start-time":"6","execution-stop-time":"7","execution-time":"1","method":"GET","type":"MEMCACHED","content":"254594297b0ae5a81c3ef6f9dba1396e"},{"execution-start-time":"49","execution-stop-time":"49","execution-time":"0","method":"GET","type":"MEMCACHED","content":"344c321643301117e627eafd90bb68e1"}],"query":[{"execution-start-time":"7","execution-stop-time":"49","execution-time":"42","params":"{url=[http://ichart.finance.yahoo.com/table.csv?g=d&f=2013&e=26&c=2013&b=10&a=10&d=10&s=CMG]}","content":"select * from csv(0,1) where url=@url"},{"execution-start-time":"50","execution-stop-time":"55","execution-time":"5","params":"{columnsNames=[Date,Open,High,Low,Close,Volume,Adj_Close], url=[http://ichart.finance.yahoo.com/table.csv?g=d&f=2013&e=26&c=2013&b=10&a=10&d=10&s=CMG]}","content":"select * from csv(2,0) where url=@url and columns=@columnsNames"}],"javascript":{"execution-start-time":"5","execution-stop-time":"61","execution-time":"55","instructions-used":"100277","table-name":"yahoo.finance.historicaldata"},"user-time":"62","service-time":"47","build-version":"0.2.2090"},"results":{"quote":[{"Symbol":"CMG","Date":"2013-11-26","Open":"532.16","High":"532.77","Low":"525.00","Close":"525.00","Volume":"392800","Adj_Close":"525.00"},{"Symbol":"CMG","Date":"2013-11-25","Open":"537.55","High":"540.94","Low":"530.88","Close":"532.31","Volume":"201500","Adj_Close":"532.31"},{"Symbol":"CMG","Date":"2013-11-22","Open":"544.00","High":"544.00","Low":"536.48","Close":"537.48","Volume":"221100","Adj_Close":"537.48"},{"Symbol":"CMG","Date":"2013-11-21","Open":"534.90","High":"542.00","Low":"531.20","Close":"539.22","Volume":"382100","Adj_Close":"539.22"},{"Symbol":"CMG","Date":"2013-11-20","Open":"536.00","High":"542.51","Low":"528.46","Close":"531.66","Volume":"254400","Adj_Close":"531.66"},{"Symbol":"CMG","Date":"2013-11-19","Open":"539.00","High":"541.81","Low":"537.73","Close":"538.16","Volume":"246000","Adj_Close":"538.16"},{"Symbol":"CMG","Date":"2013-11-18","Open":"547.23","High":"550.28","Low":"535.16","Close":"537.51","Volume":"274200","Adj_Close":"537.51"},{"Symbol":"CMG","Date":"2013-11-15","Open":"545.99","High":"549.50","Low":"544.88","Close":"546.97","Volume":"309800","Adj_Close":"546.97"},{"Symbol":"CMG","Date":"2013-11-14","Open":"534.30","High":"544.67","Low":"534.30","Close":"543.92","Volume":"255300","Adj_Close":"543.92"},{"Symbol":"CMG","Date":"2013-11-13","Open":"534.55","High":"538.38","Low":"533.11","Close":"537.58","Volume":"216800","Adj_Close":"537.58"},{"Symbol":"CMG","Date":"2013-11-12","Open":"535.76","High":"537.73","Low":"532.00","Close":"535.42","Volume":"226600","Adj_Close":"535.42"},{"Symbol":"CMG","Date":"2013-11-11","Open":"535.71","High":"537.24","Low":"534.00","Close":"536.44","Volume":"164400","Adj_Close":"536.44"}]}}}
 
 stock.symbol = "AAPL";
-
-var basicCrossoverStrategy = {
-	positionLong: function(val, keyVal) { return val > keyVal; },
-	position: function(val, keyVal) { return this.positionLong(val, keyVal) ? 1 : 0; }
-}
-
-testGenerateSignals();
-// testBasicCrossoverStrategy();
-// testMovingAverage();
-// getData(stock, startDate, endDate);
-// populateStockFromYahooQueryData(stock, yahooResponse);
 
 function createWeeklyQuotes(dailyQuotes) {
 	var weeklyQuotes = Array();
@@ -185,70 +175,4 @@ function testMovingAverage() {
 		console.log(i + " Avg: " + avgs[i])
 	}
 }
-
-function testBasicCrossoverStrategy() {
-	console.log("Even, 1 vs 1:" + basicCrossoverStrategy.positionLong(1, 1))
-	console.log("Above, 1.1 vs 1:" + basicCrossoverStrategy.positionLong(1.1, 1))
-	console.log("Below, .9 vs 1:" + basicCrossoverStrategy.positionLong(.9, 1))
-	console.log("Even, 1 vs 1:" + basicCrossoverStrategy.position(1, 1))
-	console.log("Above, 1.1 vs 1:" + basicCrossoverStrategy.position(1.1, 1))
-	console.log("Below, .9 vs 1:" + basicCrossoverStrategy.position(.9, 1))
-}
-
-function generateSignalsUsingQuotesAndKeyValuesAndStrategy(quotes, keyValues, strategy, quoteValueLabel) {
-	strategy = strategy || basicCrossoverStrategy
-	quoteValueLabel = quoteValueLabel || "Close"
-	
-	var signals = []
-	var index = 0
-	var numberOfValues = keyValues.length
-	var position = 0 // 0 indicates flat, 1 indicates long
-	var action
-	
-	signals.push("Begin Study Period with " + numberOfValues + " total quotes.");
-	while (index < numberOfValues && keyValues[index] == 0) {
-		index++
-	}
-	signals.push("Begin trading on index " + index);
-	for (;index < numberOfValues; index++) {
-		var newPos = strategy.position(quotes[index][quoteValueLabel], keyValues[index])
-		if (newPos != position) {
-			position = newPos;
-			action = position ? "Buy" : "Sell"
-			signals.push(action + " at " + quotes[index][quoteValueLabel] + " based on key value of " + keyValues[index])
-		}
-	}
-	signals.push("End trading with position " + (position ? "long" : "flat"));
-	return signals;
-}
-
-function testGenerateSignals() {
-	var quotes = [];
-	for (var i = 0; i < 100; i++) {
-		var quote = {"testVal": i % 7 }
-		quotes.push(quote)
-	}
-	var avgs = movingAverageForQuotes(quotes, 11, "testVal")
-	var signals = generateSignalsUsingQuotesAndKeyValuesAndStrategy(quotes, avgs, basicCrossoverStrategy, "testVal")
-	for (var i = 0; i < signals.length; i++) {
-		console.log(i + " : " + signals[i])
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
