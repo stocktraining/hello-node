@@ -1,5 +1,5 @@
 var assert = require('chai').assert;
-var strategies = require('../domain/strategies/crossoverStrategies.js');
+var strategies = require('../domain/crossoverStrategies.js');
 
 suite('BasicCrossover', function(){
   test("basicCrossoverStrategy is defined", function() {
