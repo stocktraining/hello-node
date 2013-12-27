@@ -1,5 +1,31 @@
 var $ = require('jQuery');
 
+exports.Quote = function(aQuoteLikeObject) {
+
+	var date
+	if (aQuoteLikeObject["Date"]) {
+		var dateComps = aQuoteLikeObject["Date"].split("-")
+		date = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])  // month is zero indexed
+	} else {
+		date = new Date(2001, 0, 1)
+	}
+	var open = aQuoteLikeObject["Open"] || 0
+	var high = aQuoteLikeObject["High"] || 0 
+	var low = aQuoteLikeObject["Low"] || 0
+	var close = aQuoteLikeObject["Close"] || 0
+	var volume = aQuoteLikeObject["Volume"] || 0
+	var adjClose = aQuoteLikeObject["Adj_Close"] || 0
+
+	this.date = function() {return date;}
+	this.open = function() {return open;}
+	this.high = function() {return high;}
+	this.low = function() {return low;}
+	this.close = function() {return close;}
+	this.volume = function() {return volume;}
+	this.adjClose = function() {return adjClose;}
+	
+}
+
 exports.getDailyQuotes = function(symbol, startDate, endDate) {
     var url = "http://query.yahooapis.com/v1/public/yql";
 	var data = encodeURIComponent("select * from yahoo.finance.historicaldata where symbol in ('" + symbol + "') and startDate = '" + startDate + "' and endDate = '" + endDate + "'");

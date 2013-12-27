@@ -4,7 +4,6 @@ var signal = require('../domain/signals.js');
 
 suite('SignalGeneration', function(){
   test("signals are constructed correctly and are immutable", function() {
-	// ensure no easy way to mess with signal once created
 	var aSignal = new signal.Signal(0, 1, "12-13-2013", 123.45)
 	
 	assert.isDefined(aSignal.fromPosition)

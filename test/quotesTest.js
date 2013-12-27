@@ -1,5 +1,7 @@
 var assert = require('chai').assert;
 var quote = require('../domain/quotes.js');
+var chai = require('chai');
+chai.use(require('chai-datetime'));
 
 var weekday=new Array(7);
 weekday[0]="Sunday";
@@ -9,6 +11,34 @@ weekday[3]="Wednesday";
 weekday[4]="Thursday";
 weekday[5]="Friday";
 weekday[6]="Saturday";
+
+suite('QuoteCreation', function() {
+  test("quotes are constructed correctly and are immutable", function() {
+	var aQuote;
+	var aQuoteLikeObject = {}
+
+	aQuoteLikeObject["Date"] = "2013-01-01"
+	aQuoteLikeObject["Open"] = "2"
+	aQuoteLikeObject["High"] = "5" 
+	aQuoteLikeObject["Low"] = "1"
+	aQuoteLikeObject["Close"] = "4.4"
+	aQuoteLikeObject["Volume"] = "3000"
+	aQuoteLikeObject["Adj_Close"] = "4.4"
+
+	aQuote = new quote.Quote(aQuoteLikeObject)
+	
+	assert.isDefined(aQuote.date)
+	assert.isDefined(aQuote.open)
+	assert.isDefined(aQuote.high)
+	assert.isDefined(aQuote.low)
+	assert.isDefined(aQuote.close)
+	assert.isDefined(aQuote.adjClose)
+	assert.isDefined(aQuote.volume)
+	
+	assert.equalDate(new Date(2013, 0, 1), aQuote.date())
+
+  })
+});
 
 suite('DailyQuoteRetrieval', function(){
   test("getDailyQuotes is defined", function() {
