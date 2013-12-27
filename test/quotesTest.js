@@ -18,6 +18,7 @@ suite('QuoteCreation', function() {
 	var aQuoteLikeObject = {}
 	var aDate = new Date(2013, 0, 1)
 
+	aQuoteLikeObject["Symbol"] = "CMG"
 	aQuoteLikeObject["Date"] = "2013-01-01"
 	aQuoteLikeObject["Open"] = "2"
 	aQuoteLikeObject["High"] = "5" 
@@ -28,6 +29,7 @@ suite('QuoteCreation', function() {
 
 	aQuote = new quote.Quote(aQuoteLikeObject)
 	
+	assert.isDefined(aQuote.symbol)
 	assert.isDefined(aQuote.date)
 	assert.isDefined(aQuote.open)
 	assert.isDefined(aQuote.high)
@@ -37,7 +39,9 @@ suite('QuoteCreation', function() {
 	assert.isDefined(aQuote.volume)
 	assert.isDefined(aQuote.startDate)
 	assert.isDefined(aQuote.endDate)
+	assert.isDefined(aQuote.count)
 	
+	assert.equal("CMG", aQuote.symbol())
 	assert.equalDate(aDate, aQuote.date())
 	assert.equal(2, aQuote.open())
 	assert.equal(5, aQuote.high())
@@ -45,15 +49,22 @@ suite('QuoteCreation', function() {
 	assert.equal(4.4, aQuote.close())
 	assert.equal(3000, aQuote.volume())
 	assert.equal(4.4, aQuote.adjClose())
+	// dates default to Date if not supplied
 	assert.equalDate(aDate, aQuote.startDate())
 	assert.equalDate(aDate, aQuote.endDate())
+	assert.equal(1, aQuote.count())
 	
-	aQuoteLikeObject.startDate = new Date(2012, 5, 5)
-	aQuoteLikeObject.endDate = new Date(2013, 5, 8)
+	var date2 = new Date(2012, 5, 5)
+	var date3 = new Date(2013, 5, 8)
+	aQuoteLikeObject.startDate = date2
+	aQuoteLikeObject.endDate = date3
+	aQuoteLikeObject["Count"] = 5
 	
 	aQuote = new quote.Quote(aQuoteLikeObject)
-	assert.equalDate(new Date(2012, 5, 5), aQuote.startDate())
-	assert.equalDate(new Date(2013, 5, 8), aQuote.endDate())
+	
+	assert.equalDate(date2, aQuote.startDate())
+	assert.equalDate(date3, aQuote.endDate())
+	assert.equal(5, aQuote.count())
 	
   })
 });
@@ -81,8 +92,8 @@ suite('DailyQuoteCreation', function(){
   test("createDailyQuotes on known response creates correct quotes", function() {
 	var dailyQuotes = quote.createDailyQuotes(quote.sampleYahooResponse)
 	
-	// printDailyQuotes(dailyQuotes)
 	assert.equal(12, dailyQuotes.length)
+	assert.equal("CMG", dailyQuotes[0].symbol())  
   })
 });
 
@@ -96,9 +107,9 @@ suite('WeeklyQuoteCreation', function(){
 	
 	// printWeeklyQuotes(weeklyQuotes)
 	assert.equal(3, weeklyQuotes.length)
-	assert.equal(2, weeklyQuotes[0]["Count"])
-	assert.equal(5, weeklyQuotes[1]["Count"])
-	assert.equal(5, weeklyQuotes[2]["Count"])
+	assert.equal(2, weeklyQuotes[0].count())
+	assert.equal(5, weeklyQuotes[1].count())
+	assert.equal(5, weeklyQuotes[2].count())
   })
 });
 
@@ -109,15 +120,16 @@ function printDailyQuotes(quotes) {
 	for (var indexedQuote in quotes) {
 	    if (quotes.hasOwnProperty(indexedQuote)) {
 			var quote = quotes[indexedQuote]
-			console.log(quote["Date"] + ", " +
-				quote["Open"] + ", " +
-				quote["High"] + ", " + 
-				quote["Low"] + ", " +
-				quote["Close"] + ", " +
-				quote["Volume"] + ", " +
-				quote["Adj_Close"] + ", " +
-				quote["ActualDate"].getDay() + ", " +
-				weekday[quote["ActualDate"].getDay()]);	
+			console.log(quote.symbol() + ", " +
+				quote.date() + ", " +
+				quote.open() + ", " +
+				quote.high() + ", " + 
+				quote.low() + ", " +
+				quote.close() + ", " +
+				quote.volume() + ", " +
+				quote.adjClose() + ", " +
+				(quote.date()).getDay() + ", " +
+				weekday[(quote.date()).getDay()]);	
 	    }
 	 }	
 }
@@ -128,12 +140,13 @@ function printWeeklyQuotes(weeklyQuotes) {
 	
 	for (var i = 0; i < weeklyQuotes.length; i++) {
 		var quote = weeklyQuotes[i]
-		console.log(quote["StartDate"] + ", " +
-			quote["EndDate"] + ", " +
-			quote["Open"] + ", " +
-			quote["High"] + ", " + 
-			quote["Low"] + ", " +
-			quote["Close"] + ", " +
-			quote["Count"]);		        
+		console.log(quote.startDate() + ", " +
+			quote.endDate() + ", " +
+			quote.open() + ", " +
+			quote.high() + ", " + 
+			quote.low() + ", " +
+			quote.close() + ", " +
+			quote.count());		        
 	}	
 }
+

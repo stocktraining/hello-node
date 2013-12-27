@@ -8,6 +8,7 @@ exports.Signal = function(fromPosition, toPosition, date, price) {
 	var transDate = date
 	var transPrice = price
 	
+	// TODO rewrite class so that these methods are on the class prototype instead of part of each instantiated object.
 	this.fromPosition = function() {return fromPos;}
 	this.toPosition = function() {return toPos;}
 	this.date = function() {return transDate;}

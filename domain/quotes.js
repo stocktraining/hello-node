@@ -1,24 +1,27 @@
 var $ = require('jQuery');
 
 exports.Quote = function(aQuoteLikeObject) {
-
-	var date
+	var symbol = aQuoteLikeObject["Symbol"] || ""
+	var aDate
 	if (aQuoteLikeObject["Date"]) {
 		var dateComps = aQuoteLikeObject["Date"].split("-")
-		date = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])  // month is zero indexed
+		aDate = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])  // month is zero indexed
 	} else {
-		date = new Date(2001, 0, 1)
+		aDate = new Date(2001, 0, 1)
 	}
+	
 	var open = aQuoteLikeObject["Open"] || 0
 	var high = aQuoteLikeObject["High"] || 0 
 	var low = aQuoteLikeObject["Low"] || 0
 	var close = aQuoteLikeObject["Close"] || 0
 	var volume = aQuoteLikeObject["Volume"] || 0
 	var adjClose = aQuoteLikeObject["Adj_Close"] || 0
-	var startDate = aQuoteLikeObject.startDate || date
-	var endDate = aQuoteLikeObject.endDate || date
+	var startDate = aQuoteLikeObject.startDate || aDate
+	var endDate = aQuoteLikeObject.endDate || aDate
+	var count = aQuoteLikeObject["Count"] || 1
 
-	this.date = function() {return date;}
+	this.symbol = function() {return symbol;}
+	this.date = function() {return aDate;}
 	this.open = function() {return open;}
 	this.high = function() {return high;}
 	this.low = function() {return low;}
@@ -27,7 +30,7 @@ exports.Quote = function(aQuoteLikeObject) {
 	this.adjClose = function() {return adjClose;}
 	this.startDate = function() {return startDate;}
 	this.endDate = function() {return endDate;}
-	
+	this.count = function() {return count;}
 }
 
 exports.getDailyQuotes = function(symbol, startDate, endDate) {
@@ -44,52 +47,59 @@ exports.sampleYahooResponse = {"query":{"count":12,"created":"2013-12-24T02:44:1
 
 exports.createDailyQuotes = function(yahooQueryResults) {
 	var results = yahooQueryResults.query.results.quote
+	var dailyQuotes = []
 	var dateComps;
 
 	for (var indexedQuote in results) {
 	    if (results.hasOwnProperty(indexedQuote)) {
-			var quote = results[indexedQuote]
-			dateComps = quote["Date"].split("-")
-			quote["ActualDate"] = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])
+			// console.log("A good looking quoteLikeObject: " + JSON.stringify(results[indexedQuote]))
+			dailyQuotes.push(new exports.Quote(results[indexedQuote]))
 	    }
 	 }
 	
-	return results;
+	return dailyQuotes;
 }
 
 exports.createWeeklyQuotes = function(dailyQuotes) {
-	var weeklyQuotes = Array();
+	var weeklyQuotes = [];
 	var weeklyQuoteCurrentDay = 0; // no current quote
 	var currWeeklyQuote;
-	var date = new Date();
+	var date;
+	var newWeeklyQuote;
 	
 	for (var indexedQuote in dailyQuotes) {
 	    if (dailyQuotes.hasOwnProperty(indexedQuote)) {
 			var quote = dailyQuotes[indexedQuote];
-			dateComps = quote["Date"].split("-");
-			date.setFullYear(dateComps[0], dateComps[1] - 1, dateComps[2]);
+			date = quote.date()
 			if (currWeeklyQuote && (date.getDay() < weeklyQuoteCurrentDay)) {
 				// this is an EARLIER day, so update Open/StartDate, not Close/EndDate
-				currWeeklyQuote["StartDate"] = quote["Date"]
-				currWeeklyQuote["Open"] = quote["Open"]
-				currWeeklyQuote["High"] = Math.max(currWeeklyQuote["High"], quote["High"])
-				currWeeklyQuote["Low"] = Math.min(currWeeklyQuote["Low"], quote["Low"])
+				currWeeklyQuote["StartDate"] = quote.date()
+				currWeeklyQuote["Open"] = quote.open()
+				currWeeklyQuote["High"] = Math.max(currWeeklyQuote["High"], quote.high())
+				currWeeklyQuote["Low"] = Math.min(currWeeklyQuote["Low"], quote.low())
 				weeklyQuoteCurrentDay = date.getDay()						
 				currWeeklyQuote["Count"]++						
 			} else {
+				if (currWeeklyQuote) {
+					weeklyQuotes.push(new exports.Quote(currWeeklyQuote))
+				}
 				currWeeklyQuote = {};
-				currWeeklyQuote["StartDate"] = quote["Date"]
-				currWeeklyQuote["EndDate"] = quote["Date"]
-				currWeeklyQuote["Open"] = quote["Open"]
-				currWeeklyQuote["Close"] = quote["Close"]
-				currWeeklyQuote["High"] = quote["High"]
-				currWeeklyQuote["Low"] = quote["Low"]
+				currWeeklyQuote["Symbol"] = quote.symbol()
+				currWeeklyQuote["Date"] = "2012-12-12"
+				currWeeklyQuote["StartDate"] = quote.date()
+				currWeeklyQuote["EndDate"] = quote.date()
+				currWeeklyQuote["Open"] = quote.open()
+				currWeeklyQuote["Close"] = quote.close()
+				currWeeklyQuote["High"] = quote.high()
+				currWeeklyQuote["Low"] = quote.low()
 				currWeeklyQuote["Count"] = 1
 				weeklyQuoteCurrentDay = date.getDay()
-				weeklyQuotes.push(currWeeklyQuote)
 			}
 	    }
 	 }
+	 if (currWeeklyQuote) {
+ 		weeklyQuotes.push(new exports.Quote(currWeeklyQuote))
+     }
 
 	return weeklyQuotes;
 }
