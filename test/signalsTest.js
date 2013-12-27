@@ -3,6 +3,32 @@ var strategies = require('../domain/crossoverStrategies.js');
 var signal = require('../domain/signals.js');
 
 suite('SignalGeneration', function(){
+  test("signals are constructed correctly and are immutable", function() {
+	// ensure no easy way to mess with signal once created
+	var aSignal = new signal.Signal(0, 1, "12-13-2013", 123.45)
+	
+	assert.isDefined(aSignal.fromPosition)
+	assert.isDefined(aSignal.toPosition)
+	assert.isDefined(aSignal.date)
+	assert.isDefined(aSignal.price)
+	
+	assert.equal(0, aSignal.fromPosition())
+	assert.equal(1, aSignal.toPosition())
+	assert.equal("12-13-2013", aSignal.date())
+	assert.equal(123.45, aSignal.price())
+	
+	aSignal.fromPos = 10 // shouldn't work because signal constructor makes it immutable
+	assert.equal(0, aSignal.fromPosition())
+
+	aSignal.toPos = 10 // shouldn't work because signal constructor makes it immutable
+	assert.equal(1, aSignal.toPosition())
+
+	aSignal.transDate = "10" // shouldn't work because signal constructor makes it immutable
+	assert.equal("12-13-2013", aSignal.date())
+	
+	aSignal.transPrice = 10 // shouldn't work because signal constructor makes it immutable
+	assert.equal(123.45, aSignal.price())
+  }),
   test("generate is defined", function() {
     assert.isDefined(signal.generateSignals);
   }),

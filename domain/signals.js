@@ -1,4 +1,19 @@
 
+exports.Signal = function(fromPosition, toPosition, date, price) {
+
+//	this.fromPos = fromPosition  --> this style would expose the variable for manipulation
+	
+	var fromPos = fromPosition
+	var toPos = toPosition
+	var transDate = date
+	var transPrice = price
+	
+	this.fromPosition = function() {return fromPos;}
+	this.toPosition = function() {return toPos;}
+	this.date = function() {return transDate;}
+	this.price = function() {return transPrice;}
+}
+
 exports.generateSignals = function(quotes, keyValues, strategy, quoteValueLabel) {
 	if (!quotes || !keyValues || !strategy || quotes.length != keyValues.length) {
 		return [];
