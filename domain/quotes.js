@@ -15,6 +15,8 @@ exports.Quote = function(aQuoteLikeObject) {
 	var close = aQuoteLikeObject["Close"] || 0
 	var volume = aQuoteLikeObject["Volume"] || 0
 	var adjClose = aQuoteLikeObject["Adj_Close"] || 0
+	var startDate = aQuoteLikeObject.startDate || date
+	var endDate = aQuoteLikeObject.endDate || date
 
 	this.date = function() {return date;}
 	this.open = function() {return open;}
@@ -23,6 +25,8 @@ exports.Quote = function(aQuoteLikeObject) {
 	this.close = function() {return close;}
 	this.volume = function() {return volume;}
 	this.adjClose = function() {return adjClose;}
+	this.startDate = function() {return startDate;}
+	this.endDate = function() {return endDate;}
 	
 }
 

@@ -16,6 +16,7 @@ suite('QuoteCreation', function() {
   test("quotes are constructed correctly and are immutable", function() {
 	var aQuote;
 	var aQuoteLikeObject = {}
+	var aDate = new Date(2013, 0, 1)
 
 	aQuoteLikeObject["Date"] = "2013-01-01"
 	aQuoteLikeObject["Open"] = "2"
@@ -34,9 +35,26 @@ suite('QuoteCreation', function() {
 	assert.isDefined(aQuote.close)
 	assert.isDefined(aQuote.adjClose)
 	assert.isDefined(aQuote.volume)
+	assert.isDefined(aQuote.startDate)
+	assert.isDefined(aQuote.endDate)
 	
-	assert.equalDate(new Date(2013, 0, 1), aQuote.date())
-
+	assert.equalDate(aDate, aQuote.date())
+	assert.equal(2, aQuote.open())
+	assert.equal(5, aQuote.high())
+	assert.equal(1, aQuote.low())
+	assert.equal(4.4, aQuote.close())
+	assert.equal(3000, aQuote.volume())
+	assert.equal(4.4, aQuote.adjClose())
+	assert.equalDate(aDate, aQuote.startDate())
+	assert.equalDate(aDate, aQuote.endDate())
+	
+	aQuoteLikeObject.startDate = new Date(2012, 5, 5)
+	aQuoteLikeObject.endDate = new Date(2013, 5, 8)
+	
+	aQuote = new quote.Quote(aQuoteLikeObject)
+	assert.equalDate(new Date(2012, 5, 5), aQuote.startDate())
+	assert.equalDate(new Date(2013, 5, 8), aQuote.endDate())
+	
   })
 });
 
