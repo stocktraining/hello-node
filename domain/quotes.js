@@ -1,8 +1,8 @@
 var $ = require('jQuery');
 
 exports.Quote = function(aQuoteLikeObject) {
-	var symbol = aQuoteLikeObject["Symbol"] || ""
-	var aDate
+	var symbol = aQuoteLikeObject["Symbol"] || "";
+	var aDate;
 	if (aQuoteLikeObject["Date"]) {
 		var dateComps = aQuoteLikeObject["Date"].split("-")
 		aDate = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])  // month is zero indexed
