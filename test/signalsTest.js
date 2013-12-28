@@ -218,7 +218,7 @@ suite('calculateReturn', function () {
             ];
             var avgs = [90, 90, 111, 130];
             var signals = signal.generateSignals(quotes, avgs, strategies.basicCrossoverStrategy);
-            
+
             assert.equal(10.11, signal.calculateReturn(signals));
         }),
         test("calculateReturn is correct for a compound winning trade", function () {
