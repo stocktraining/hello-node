@@ -58,7 +58,16 @@ exports.generateSignals = function (quotes, keyValues, strategy) {
         }
     }
     description = "End trading with position " + (position ? "long" : "flat") + ".";
-    signals.push(new exports.Signal(0, 0, quotes[index - 1].date(), quotes[index - 1].close(), description));
+    signals.push(new exports.Signal(position, position, quotes[index - 1].date(), quotes[index - 1].close(), description));
 
     return signals;
-}
+};
+
+exports.buyAndHoldReturn = function(signals) {
+  // some embedded knowledge here, might be nice to make it programmatic.
+  // [0] is studyPeriod
+  // [1] is start trading
+  // [length-1] is ending amount
+
+    return 100*(signals[signals.length-1].price() - signals[1].price())/signals[1].price();
+};

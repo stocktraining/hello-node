@@ -3,7 +3,7 @@ var strategies = require('../domain/crossoverStrategies.js');
 var signal = require('../domain/signals.js');
 var quote = require('../domain/quotes.js');
 
-suite('SignalGeneration', function () {
+suite('SignalCreation', function () {
     test("signals are constructed correctly and are immutable", function () {
         var aSignal = new signal.Signal(0, 1, "12-13-2013", 123.45, "A description")
 
@@ -36,7 +36,10 @@ suite('SignalGeneration', function () {
             assert.isTrue((new signal.Signal(1, 0)).transactional());
             assert.isFalse((new signal.Signal(1, 1)).transactional());
             assert.isFalse((new signal.Signal(0, 0)).transactional());
-        }),
+        })
+});
+
+suite('SignalGeneration', function () {
         test("generate is defined", function () {
             assert.isDefined(signal.generateSignals);
         }),
@@ -136,6 +139,7 @@ suite('SignalGeneration', function () {
 
             assert.equal(4, signals.length);
             assert.equal(true, signals[3].description().indexOf("long") != -1);
+            assert.equal(true, signals[3].toPosition());
 
             quotes.push(new quote.Quote({"Close" : 1}));
             avgs.push(1);
@@ -143,7 +147,50 @@ suite('SignalGeneration', function () {
 
             assert.equal(5, signals.length);
             assert.equal(true, signals[4].description().indexOf("flat") != -1)
+            assert.equal(false, signals[4].toPosition());
         })
+});
+
+suite('SignalReturnCalculation', function () {
+    test("buyAndHoldReturn is defined", function () {
+        assert.isDefined(signal.buyAndHoldReturn);
+    }),
+    test("buyAndHoldReturn is correct for a break even trade", function() {
+        var quotes = [
+            new quote.Quote({"Close" : 100}),
+            new quote.Quote({"Close" : 90.55}),
+            new quote.Quote({"Close" : 110.10}),
+            new quote.Quote({"Close" : 100})
+        ];
+        var avgs = [110, 105, 110, 120];
+        var signals = signal.generateSignals(quotes, avgs, strategies.basicCrossoverStrategy);
+
+        assert.equal(0, signal.buyAndHoldReturn(signals));
+    })
+    test("buyAndHoldReturn is correct for a winning trade", function() {
+        var quotes = [
+            new quote.Quote({"Close" : 100}),
+            new quote.Quote({"Close" : 90.55}),
+            new quote.Quote({"Close" : 110.10}),
+            new quote.Quote({"Close" : 125.25})
+        ];
+        var avgs = [110, 105, 110, 120];
+        var signals = signal.generateSignals(quotes, avgs, strategies.basicCrossoverStrategy);
+
+        assert.equal(25.25, signal.buyAndHoldReturn(signals));
+    })
+    test("buyAndHoldReturn is correct for a losing trade", function() {
+        var quotes = [
+            new quote.Quote({"Close" : 100}),
+            new quote.Quote({"Close" : 90.55}),
+            new quote.Quote({"Close" : 110.10}),
+            new quote.Quote({"Close" : 98.00})
+        ];
+        var avgs = [110, 105, 110, 120];
+        var signals = signal.generateSignals(quotes, avgs, strategies.basicCrossoverStrategy);
+
+        assert.equal(-2, signal.buyAndHoldReturn(signals));
+    })
 });
 
 // handy for outputting the signals for inspection
