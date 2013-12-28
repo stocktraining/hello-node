@@ -1,8 +1,5 @@
-1) npm install
-
-=====Start=====
-npm start 
+1) npm install, add dependencies to package.json
 
 =====Test=====
-npm test
+mocha -u tdd
 
