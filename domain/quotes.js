@@ -1,4 +1,4 @@
-var $ = require('jQuery');
+var $ = require('jquery');
 
 exports.Quote = function(aQuoteLikeObject) {
 	var symbol = aQuoteLikeObject["Symbol"] || "";
@@ -10,15 +10,15 @@ exports.Quote = function(aQuoteLikeObject) {
 		aDate = new Date(2001, 0, 1)
 	}
 	
-	var open = aQuoteLikeObject["Open"] || 0
-	var high = aQuoteLikeObject["High"] || 0 
-	var low = aQuoteLikeObject["Low"] || 0
-	var close = aQuoteLikeObject["Close"] || 0
-	var volume = aQuoteLikeObject["Volume"] || 0
-	var adjClose = aQuoteLikeObject["Adj_Close"] || 0
-	var startDate = aQuoteLikeObject.startDate || aDate
-	var endDate = aQuoteLikeObject.endDate || aDate
-	var count = aQuoteLikeObject["Count"] || 1
+	var open = aQuoteLikeObject["Open"] || 0;
+	var high = aQuoteLikeObject["High"] || 0;
+	var low = aQuoteLikeObject["Low"] || 0;
+	var close = aQuoteLikeObject["Close"] || 0;
+	var volume = aQuoteLikeObject["Volume"] || 0;
+	var adjClose = aQuoteLikeObject["Adj_Close"] || 0;
+	var startDate = aQuoteLikeObject.startDate || aDate;
+	var endDate = aQuoteLikeObject.endDate || aDate;
+	var count = aQuoteLikeObject["Count"] || 1;
 
 	this.symbol = function() {return symbol;}
 	this.date = function() {return aDate;}
@@ -34,7 +34,7 @@ exports.Quote = function(aQuoteLikeObject) {
 }
 
 exports.getDailyQuotes = function(symbol, startDate, endDate) {
-    var url = "http://query.yahooapis.com/v1/public/yql";
+  var url = "http://query.yahooapis.com/v1/public/yql";
 	var data = encodeURIComponent("select * from yahoo.finance.historicaldata where symbol in ('" + symbol + "') and startDate = '" + startDate + "' and endDate = '" + endDate + "'");
     $.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
         .done(function (data) {
