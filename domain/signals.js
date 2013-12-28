@@ -71,3 +71,29 @@ exports.buyAndHoldReturn = function(signals) {
 
     return 100*(signals[signals.length-1].price() - signals[1].price())/signals[1].price();
 };
+
+exports.calculateReturn = function(signals) {
+    // some embedded knowledge here, might be nice to make it programmatic.
+    // [0] is studyPeriod
+    // [1] is start trading
+    // [length-1] is ending amount
+
+    var aggregateReturn = 1;
+    var purchasePrice = 0;
+
+    for (var index = 0; index < signals.length; index++) {
+        var currentSignal = signals[index];
+        if (currentSignal.transactional()) {
+            if (currentSignal.toPosition() > 0) {  // buy
+                purchasePrice = signals[index].price();
+            } else {  // sell
+                aggregateReturn *= 1 + (currentSignal.price() - purchasePrice)/purchasePrice;
+                purchasePrice = 0;
+            }
+        }
+    }
+    if (purchasePrice > 0) {
+        aggregateReturn *= 1 + (signals[signals.length-1].price() - purchasePrice)/purchasePrice;
+    }
+    return Math.round(10000 * (aggregateReturn - 1))/100;
+};
