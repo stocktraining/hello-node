@@ -1,36 +1,37 @@
 var $ = require('jquery');
 
-exports.Quote = function(aQuoteLikeObject) {
-	var symbol = aQuoteLikeObject["Symbol"] || "";
-	var aDate;
+var Quote = exports.Quote = function(aQuoteLikeObject) {
+	this._symbol = aQuoteLikeObject["Symbol"] || "";
+	this._aDate;
 	if (aQuoteLikeObject["Date"]) {
 		var dateComps = aQuoteLikeObject["Date"].split("-")
-		aDate = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])  // month is zero indexed
+		this._aDate = new Date(dateComps[0], dateComps[1] - 1, dateComps[2])  // month is zero indexed
 	} else {
-		aDate = new Date(2001, 0, 1)
+		this._aDate = new Date(2001, 0, 1)
 	}
-	
-	var open = aQuoteLikeObject["Open"] || 0;
-	var high = aQuoteLikeObject["High"] || 0;
-	var low = aQuoteLikeObject["Low"] || 0;
-	var close = aQuoteLikeObject["Close"] || 0;
-	var volume = aQuoteLikeObject["Volume"] || 0;
-	var adjClose = aQuoteLikeObject["Adj_Close"] || 0;
-	var startDate = aQuoteLikeObject.startDate || aDate;
-	var endDate = aQuoteLikeObject.endDate || aDate;
-	var count = aQuoteLikeObject["Count"] || 1;
+	this._open = aQuoteLikeObject["Open"] || 0;
+	this._high = aQuoteLikeObject["High"] || 0;
+	this._low = aQuoteLikeObject["Low"] || 0;
+	this._close = aQuoteLikeObject["Close"] || 0;
+	this._volume = aQuoteLikeObject["Volume"] || 0;
+	this._adjClose = aQuoteLikeObject["Adj_Close"] || 0;
+	this._startDate = aQuoteLikeObject.startDate || this._aDate;
+	this._endDate = aQuoteLikeObject.endDate || this._aDate;
+	this._count = aQuoteLikeObject["Count"] || 1;
+}
 
-	this.symbol = function() {return symbol;}
-	this.date = function() {return aDate;}
-	this.open = function() {return open;}
-	this.high = function() {return high;}
-	this.low = function() {return low;}
-	this.close = function() {return close;}
-	this.volume = function() {return volume;}
-	this.adjClose = function() {return adjClose;}
-	this.startDate = function() {return startDate;}
-	this.endDate = function() {return endDate;}
-	this.count = function() {return count;}
+Quote.prototype = {
+	symbol: function() {return this._symbol;},
+	date: function() {return this._aDate;},
+	open: function() {return this._open;},
+	high: function() {return this._high;},
+	low: function() {return this._low;},
+	close: function() {return this._close;},
+	volume: function() {return this._volume;},
+	adjClose: function() {return this._adjClose;},
+	startDate: function() {return this._startDate;},
+	endDate: function() {return this._endDate;},
+	count: function() {return this._count;},
 }
 
 exports.getDailyQuotes = function(symbol, startDate, endDate) {
