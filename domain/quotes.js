@@ -1,4 +1,4 @@
-var $ = require('jquery');
+var http = require("http");
 
 var Quote = exports.Quote = function(aQuoteLikeObject) {
     this._symbol = aQuoteLikeObject["Symbol"] || "";
@@ -34,13 +34,25 @@ Quote.prototype = {
     count: function() {return this._count;},
 }
 
-exports.getDailyQuotes = function(symbol, startDate, endDate) {
-    var url = "http://query.yahooapis.com/v1/public/yql";
-    var data = encodeURIComponent("select * from yahoo.finance.historicaldata where symbol in ('" + symbol + "') and startDate = '" + startDate + "' and endDate = '" + endDate + "'");
-        $.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env").done(function (data) {
-            console.log("Yahoo response: " + data);
-            return createDailyQuotes(data);
+exports.getDailyQuotes = function(symbol, startDate, endDate, callback) {
+    var YAHOO_URL = "http://query.yahooapis.com/v1/public/yql?q=";
+    var FORMAT = "&env=http%3A%2F%2Fdatatables.org%2Falltables.env&format=json";
+    var query = encodeURIComponent("select * from yahoo.finance.historicaldata where symbol in ('" + symbol + "') and startDate = '" + startDate + "' and endDate = '" + endDate + "'");
+    var url = YAHOO_URL + query + FORMAT;
+    var data = "";
+
+    http.get(url, function(response) {
+        response.setEncoding("utf8");
+        response.on('data', function (chunk) {
+            data += chunk;
         });
+        response.on("end", function(){
+            callback(JSON.parse(data));
+        });
+        response.on('error', function(err){
+            console.log("Got error: " + e.message);
+        });
+    });
 }
 
 

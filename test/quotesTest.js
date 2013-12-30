@@ -61,13 +61,15 @@ suite('DailyQuoteRetrieval', function(){
     test("getDailyQuotes is defined", function() {
         assert.isDefined(quote.getDailyQuotes);
     }),
-// need to figure out how to test the async call to yahoo.
-    test("getDailyQuotes async call as expected when online", function() {
-        var startDate = '2012-12-01'; // Sunday
+    test("getDailyQuotes async call as expected when online", function(done) {
+        var startDate = '2013-12-01'; // Sunday
         var endDate = '2013-12-07';   // Saturday
         var symbol = 'AAPL';
-        var dailyQuotes = quote.getDailyQuotes(symbol, startDate, endDate);
-    // assert.equal(5, dailyQuotes.length)
+        var responseData = quote.getDailyQuotes(symbol, startDate, endDate, function(data){
+            var dailyQuotes = quote.createDailyQuotes(data);
+            assert.equal(5, dailyQuotes.length);
+            done();
+        });
     });
 });
 
