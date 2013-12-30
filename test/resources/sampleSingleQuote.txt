@@ -1,1 +1,1 @@
-{"Symbol":"CMG","Date":"2013-11-26","Open":"532.16","High":"532.77","Low":"525.00","Close":"525.00","Volume":"392800","Adj_Close":"525.00"}
+{"Symbol":"CMG","Date":"2013-01-01","Open":"2","High":"5","Low":"1","Close":"4.4","Volume":"3000","Adj_Close":"4.4"}

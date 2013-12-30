@@ -7,7 +7,7 @@ var Quote = exports.Quote = function(aQuoteLikeObject) {
         var dateComps = aQuoteLikeObject["Date"].split("-");
         this._aDate = new Date(dateComps[0], dateComps[1] - 1, dateComps[2]);  // month is zero indexed
     } else {
-        this._aDate = new Date(2001, 0, 1);
+        this._aDate = new Date(2001, 0, 1); // why this date?
     }
     this._open = aQuoteLikeObject["Open"] || 0;
     this._high = aQuoteLikeObject["High"] || 0;
@@ -62,36 +62,35 @@ exports.createWeeklyQuotes = function(dailyQuotes) {
     var date;
     var newWeeklyQuote;
     
-    for (var indexedQuote in dailyQuotes) {
-        if (dailyQuotes.hasOwnProperty(indexedQuote)) {
-            var quote = dailyQuotes[indexedQuote];
-            date = quote.date();
-            if (currWeeklyQuote && (date.getDay() < weeklyQuoteCurrentDay)) {
-              // this is an EARLIER day, so update Open/StartDate, not Close/EndDate
-                currWeeklyQuote["StartDate"] = quote.date();
-                currWeeklyQuote["Open"] = quote.open();
-                currWeeklyQuote["High"] = Math.max(currWeeklyQuote["High"], quote.high());
-                currWeeklyQuote["Low"] = Math.min(currWeeklyQuote["Low"], quote.low());
-                weeklyQuoteCurrentDay = date.getDay();
-                currWeeklyQuote["Count"]++;
-            } else {
-                if (currWeeklyQuote) {
-                  weeklyQuotes.push(new exports.Quote(currWeeklyQuote));
-                }
-                currWeeklyQuote = {};
-                currWeeklyQuote["Symbol"] = quote.symbol();
-                currWeeklyQuote["Date"] = "2012-12-12";
-                currWeeklyQuote["StartDate"] = quote.date();
-                currWeeklyQuote["EndDate"] = quote.date();
-                currWeeklyQuote["Open"] = quote.open();
-                currWeeklyQuote["Close"] = quote.close();
-                currWeeklyQuote["High"] = quote.high();
-                currWeeklyQuote["Low"] = quote.low();
-                currWeeklyQuote["Count"] = 1;
-                weeklyQuoteCurrentDay = date.getDay();
+    for(var i = 0; i < dailyQuotes.length; i++) {
+        var quote = dailyQuotes[i];
+        date = quote.date();
+        if (currWeeklyQuote && (date.getDay() < weeklyQuoteCurrentDay)) {
+          // this is an EARLIER day, so update Open/StartDate, not Close/EndDate
+            currWeeklyQuote["StartDate"] = quote.date();
+            currWeeklyQuote["Open"] = quote.open();
+            currWeeklyQuote["High"] = Math.max(currWeeklyQuote["High"], quote.high());
+            currWeeklyQuote["Low"] = Math.min(currWeeklyQuote["Low"], quote.low());
+            weeklyQuoteCurrentDay = date.getDay();
+            currWeeklyQuote["Count"]++;
+        } else {
+            if (currWeeklyQuote) {
+              weeklyQuotes.push(new exports.Quote(currWeeklyQuote));
             }
+            currWeeklyQuote = {};
+            currWeeklyQuote["Symbol"] = quote.symbol();
+            currWeeklyQuote["Date"] = "2012-12-12";
+            currWeeklyQuote["StartDate"] = quote.date();
+            currWeeklyQuote["EndDate"] = quote.date();
+            currWeeklyQuote["Open"] = quote.open();
+            currWeeklyQuote["Close"] = quote.close();
+            currWeeklyQuote["High"] = quote.high();
+            currWeeklyQuote["Low"] = quote.low();
+            currWeeklyQuote["Count"] = 1;
+            weeklyQuoteCurrentDay = date.getDay();
         }
     }
+
     if (currWeeklyQuote) {
         weeklyQuotes.push(new exports.Quote(currWeeklyQuote));
     }
