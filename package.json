@@ -5,9 +5,6 @@
   "dependencies": {
     "mocha": "*",
     "chai": "*",
-    "jQuery": "*",
-    "chai-datetime": "*",
-    "jsdom": "*",
-    "xmlhttprequest": "*"
+    "chai-datetime": "*"
   }
 }
