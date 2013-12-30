@@ -1,9 +1,10 @@
 var assert = require('chai').assert;
 var quote = require('../domain/quotes.js');
 var chai = require('chai');
+var fs = require('fs');
 chai.use(require('chai-datetime'));
 
-var weekday=new Array(7);
+var weekday = new Array(7);
 weekday[0]="Sunday";
 weekday[1]="Monday";
 weekday[2]="Tuesday";
@@ -86,14 +87,17 @@ suite('DailyQuoteRetrieval', function(){
 });
 
 suite('DailyQuoteCreation', function(){
-  test("createDailyQuotes is defined", function() {
-    assert.isDefined(quote.createDailyQuotes);
-  }),
-  test("createDailyQuotes on known response creates correct quotes", function() {
-	var dailyQuotes = quote.createDailyQuotes(quote.sampleYahooResponse)
+	test("createDailyQuotes is defined", function() {
+		assert.isDefined(quote.createDailyQuotes);
+	}),
+	test("createDailyQuotes on known response creates correct quotes", function() {
+		var sampleResponse = fs.readFileSync("test/resources/sampleYahooQueryResults.txt", {enconding: "utf8"}).toString();
+		var sampleYahooResponse = JSON.parse(sampleResponse);
+
+		var dailyQuotes = quote.createDailyQuotes(sampleYahooResponse);
 	
-	assert.equal(12, dailyQuotes.length)
-	assert.equal("CMG", dailyQuotes[0].symbol())  
+		assert.equal(12, dailyQuotes.length);
+		assert.equal("CMG", dailyQuotes[0].symbol());
   })
 });
 
@@ -102,14 +106,16 @@ suite('WeeklyQuoteCreation', function(){
     assert.isDefined(quote.createWeeklyQuotes);
   }),
   test("createWeeklyQuotes on known response creates correct quotes", function() {
-	var dailyQuotes = quote.createDailyQuotes(quote.sampleYahooResponse)
-	var weeklyQuotes = quote.createWeeklyQuotes(dailyQuotes)
-	
-	// printWeeklyQuotes(weeklyQuotes)
-	assert.equal(3, weeklyQuotes.length)
-	assert.equal(2, weeklyQuotes[0].count())
-	assert.equal(5, weeklyQuotes[1].count())
-	assert.equal(5, weeklyQuotes[2].count())
+	  var sampleResponse = fs.readFileSync("test/resources/sampleYahooQueryResults.txt", {enconding: "utf8"}).toString();
+	  var sampleYahooResponse = JSON.parse(sampleResponse);
+		var dailyQuotes = quote.createDailyQuotes(sampleYahooResponse);
+		var weeklyQuotes = quote.createWeeklyQuotes(dailyQuotes);
+		
+		// printWeeklyQuotes(weeklyQuotes)
+		assert.equal(3, weeklyQuotes.length)
+		assert.equal(2, weeklyQuotes[0].count())
+		assert.equal(5, weeklyQuotes[1].count())
+		assert.equal(5, weeklyQuotes[2].count())
   })
 });
 
