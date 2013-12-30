@@ -62,6 +62,7 @@ suite('DailyQuoteRetrieval', function(){
         assert.isDefined(quote.getDailyQuotes);
     }),
     test("getDailyQuotes async call as expected when online", function(done) {
+        this.timeout(3000); // it would timeout on the default 2000ms
         var startDate = '2013-12-01'; // Sunday
         var endDate = '2013-12-07';   // Saturday
         var symbol = 'AAPL';
