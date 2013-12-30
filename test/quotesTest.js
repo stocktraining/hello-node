@@ -7,21 +7,10 @@ chai.use(require("chai-datetime"));
 var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 suite('QuoteCreation', function() {
-    test("quotes are constructed correctly and are immutable", function() {
-        var aQuote;
-        var aQuoteLikeObject = {};
-        var aDate = new Date(2013, 0, 1);
-
-        aQuoteLikeObject["Symbol"] = "CMG";
-        aQuoteLikeObject["Date"] = "2013-01-01";
-        aQuoteLikeObject["Open"] = "2";
-        aQuoteLikeObject["High"] = "5";
-        aQuoteLikeObject["Low"] = "1";
-        aQuoteLikeObject["Close"] = "4.4";
-        aQuoteLikeObject["Volume"] = "3000";
-        aQuoteLikeObject["Adj_Close"] = "4.4";
-
-        aQuote = new quote.Quote(aQuoteLikeObject);
+    test("quote getters are defined", function() {
+        var sampleResponse = fs.readFileSync("test/resources/sampleSingleQuote.txt", {enconding: "utf8"});
+        var aQuoteLikeObject = JSON.parse(sampleResponse);
+        var aQuote = new quote.Quote(aQuoteLikeObject);
 
         assert.isDefined(aQuote.symbol);
         assert.isDefined(aQuote.date);
@@ -34,6 +23,12 @@ suite('QuoteCreation', function() {
         assert.isDefined(aQuote.startDate);
         assert.isDefined(aQuote.endDate);
         assert.isDefined(aQuote.count);
+    }),
+    test("quotes are constructed correctly and are immutable", function() {
+        var sampleResponse = fs.readFileSync("test/resources/sampleSingleQuote.txt", {enconding: "utf8"});
+        var aQuoteLikeObject = JSON.parse(sampleResponse);
+        var aQuote = new quote.Quote(aQuoteLikeObject);
+        var aDate = new Date(2013, 0, 1);
 
         assert.equal("CMG", aQuote.symbol());
         assert.equalDate(aDate, aQuote.date());
@@ -54,12 +49,12 @@ suite('QuoteCreation', function() {
         aQuoteLikeObject.endDate = date3;
         aQuoteLikeObject["Count"] = 5;
 
-        aQuote = new quote.Quote(aQuoteLikeObject);
+        var aSecondQuote = new quote.Quote(aQuoteLikeObject);
 
-        assert.equalDate(date2, aQuote.startDate());
-        assert.equalDate(date3, aQuote.endDate());
-        assert.equal(5, aQuote.count());
-    })
+        assert.equalDate(date2, aSecondQuote.startDate());
+        assert.equalDate(date3, aSecondQuote.endDate());
+        assert.equal(5, aSecondQuote.count());
+    });
 });
 
 suite('DailyQuoteRetrieval', function(){
@@ -73,7 +68,7 @@ suite('DailyQuoteRetrieval', function(){
         var symbol = 'AAPL';
         var dailyQuotes = quote.getDailyQuotes(symbol, startDate, endDate);
     // assert.equal(5, dailyQuotes.length)
-    })
+    });
 });
 
 suite('DailyQuoteCreation', function(){
@@ -81,14 +76,14 @@ suite('DailyQuoteCreation', function(){
         assert.isDefined(quote.createDailyQuotes);
     }),
     test("createDailyQuotes on known response creates correct quotes", function() {
-        var sampleResponse = fs.readFileSync("test/resources/sampleYahooQueryResults.txt", {enconding: "utf8"}).toString();
+        var sampleResponse = fs.readFileSync("test/resources/sampleYahooQueryResults.txt", {enconding: "utf8"});
         var sampleYahooResponse = JSON.parse(sampleResponse);
 
         var dailyQuotes = quote.createDailyQuotes(sampleYahooResponse);
 
         assert.equal(12, dailyQuotes.length);
         assert.equal("CMG", dailyQuotes[0].symbol());
-    })
+    });
 });
 
 suite('WeeklyQuoteCreation', function(){
@@ -96,7 +91,7 @@ suite('WeeklyQuoteCreation', function(){
         assert.isDefined(quote.createWeeklyQuotes);
     }),
     test("createWeeklyQuotes on known response creates correct quotes", function() {
-        var sampleResponse = fs.readFileSync("test/resources/sampleYahooQueryResults.txt", {enconding: "utf8"}).toString();
+        var sampleResponse = fs.readFileSync("test/resources/sampleYahooQueryResults.txt", {enconding: "utf8"});
         var sampleYahooResponse = JSON.parse(sampleResponse);
         var dailyQuotes = quote.createDailyQuotes(sampleYahooResponse);
         var weeklyQuotes = quote.createWeeklyQuotes(dailyQuotes);
@@ -106,7 +101,7 @@ suite('WeeklyQuoteCreation', function(){
         assert.equal(2, weeklyQuotes[0].count());
         assert.equal(5, weeklyQuotes[1].count());
         assert.equal(5, weeklyQuotes[2].count());
-    })
+    });
 });
 
 function printDailyQuotes(quotes) {
@@ -127,7 +122,7 @@ function printDailyQuotes(quotes) {
                 (quote.date()).getDay() + ", " +
                 weekday[(quote.date()).getDay()]);  
         }
-     }  
+     }
 };
 
 function printWeeklyQuotes(weeklyQuotes) {
@@ -143,6 +138,5 @@ function printWeeklyQuotes(weeklyQuotes) {
             quote.low() + ", " +
             quote.close() + ", " +
             quote.count());             
-    }   
+    }
 };
-
